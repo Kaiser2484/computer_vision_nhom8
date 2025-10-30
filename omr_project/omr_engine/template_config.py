@@ -1,0 +1,52 @@
+import numpy as np
+
+# --- 1.CẤU HÌNH LAYOUT PHIẾU TRẢ LỜI ---
+
+# Kích thước ảnh chuẩn sau khi nắn thẳng
+WARPED_IMAGE_WIDTH = 793 
+WARPED_IMAGE_HEIGHT = 1122 
+
+# --- TỌA ĐỘ CÁC Ô ĐÁP ÁN ---
+# (Các giá trị này của bạn đã đúng)
+START_X_COL_1 = 138
+START_X_COL_2 = 290
+START_X_COL_3 = 444
+START_X_COL_4 = 598
+START_Y_ROWS = 466
+OPTION_X_SPACING = 20 
+QUESTION_Y_SPACING = 38 
+BUBBLE_W = 20 
+BUBBLE_H = 20
+MODEL_INPUT_IMG_SIZE = (20, 20)
+
+NUM_QUESTIONS = 60
+NUM_OPTIONS = 4 # A, B, C, D
+QUESTIONS_PER_COLUMN = 15
+OPTIONS_MAP = {0: 'A', 1: 'B', 2: 'C', 3: 'D'}
+
+# --- 2.CẤU HÌNH LAYOUT MÃ ĐỀ (TEST ID) ---
+NUM_TEST_ID_DIGITS = 3
+NUM_TEST_ID_OPTIONS = 10 # (0-9)
+TEST_ID_START_X = 294 
+TEST_ID_START_Y = 218 
+TEST_ID_X_SPACING = 20
+TEST_ID_Y_SPACING = 20
+
+ID_BUBBLE_MAP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+
+# --- 3.CẤU HÌNH LAYOUT SỐ BÁO DANH (SBD) ---
+NUM_SBD_DIGITS = 6
+NUM_SBD_OPTIONS = 10 # (0-9)
+SBD_START_X = 63 
+SBD_START_Y = 218
+SBD_X_SPACING = 20
+SBD_Y_SPACING = 20
+
+ID_BUBBLE_MAP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+
+# --- 4.CẤU HÌNH HỆ THỐNG ---
+DST_RECT = np.array([
+    [0, 0],
+    [WARPED_IMAGE_WIDTH - 1, 0],
+    [WARPED_IMAGE_WIDTH - 1, WARPED_IMAGE_HEIGHT - 1],
+    [0, WARPED_IMAGE_HEIGHT - 1]], dtype="float32")

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả chấm OMR</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; max-width: 1200px; margin: 40px auto; padding: 20px; background-color: #f4f7f6; }
+        h1 { text-align: center; color: #333; }
+        form { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto 40px auto; }
+        div { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+        input[type="file"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; background-color: #fafafa; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: 600; }
+        button:hover { background-color: #0056b3; }
+        
+        #loading { text-align: center; font-size: 18px; display: none; color: #555; }
+        #error { margin-top: 30px; background-color: #fff; padding: 20px; border-radius: 8px; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        #error pre { background-color: #fbebeb; color: #c00; padding: 15px; border-radius: 4px; }
+
+        #result-container { display: none; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
+        .result-box { background-color: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .result-box h2 { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        .result-table { max-height: 600px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px; }
+        .result-table table { width: 100%; border-collapse: collapse; }
+        .result-table th, .result-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; text-align: left; }
+        .result-table th { background-color: #f9f9f9; }
+        .result-table tr:last-child td { border-bottom: none; }
+        
+        .correct { color: #008000; font-weight: bold; }
+        .incorrect { color: #d00000; font-weight: bold; text-decoration: line-through; }
+        .incorrect-correct-ans { color: #008000; font-size: 0.9em; margin-left: 5px;}
+        .score-summary { font-size: 1.2em; font-weight: bold; color: #007bff; background-color: #f0f6ff; padding: 15px; border-radius: 5px; text-align: center; }
+        /* CSS CHO LỖI SAI MÃ ĐỀ */
+        .mismatch-error { color: red; font-weight: bold; margin-left: 10px; font-size: 0.9em; } 
+    </style>
+</head>
+<body>
+    <h1>Hệ thống chấm trắc nghiệm OMR</h1>
+    <form id="upload-form">
+        <div>
+            <label for="answer_key_image">1. Tải lên Ảnh Đáp Án (Phiếu của giáo viên):</label>
+            <input type="file" id="answer_key_image" name="answer_key_image" accept="image/*" required>
+        </div>
+        <div>
+            <label for="student_image">2. Tải lên Ảnh Bài Làm (Phiếu của học sinh):</label>
+            <input type="file" id="student_image" name="student_image" accept="image/*" required>
+        </div>
+        <button type="submit">Chấm điểm</button>
+    </form>
+
+    <div id="loading">Đang xử lý, vui lòng chờ... ⏳</div>
+    <div id="error">
+        <h2>Lỗi!</h2>
+        <pre id="error-json"></pre>
+    </div>
+
+    <div id="result-container">
+        <div class="result-box">
+            <h2><span style="color: #007bff;">■</span> Phiếu Đáp Án (Giáo viên)</h2>
+            <p><strong>Mã đề:</strong> <span id="key-test-id"></span></p>
+            <p><strong>SBD:</strong> (Phiếu đáp án)</p>
+            <div class="result-table">
+                <table><thead><tr><th>Câu</th><th>Đáp án</th></tr></thead><tbody id="key-table-body"></tbody></table>
+            </div>
+        </div>
+        <div class="result-box">
+            <h2><span style="color: #00af50;">■</span> Bài Làm (Học sinh)</h2>
+            <p><strong>Mã đề:</strong> <span id="student-test-id"></span><span id="test-id-mismatch-msg" class="mismatch-error"></span></p> 
+            <p><strong>SBD:</strong> <span id="student-sbd"></span></p>
+            <div class="score-summary">
+                Điểm: <span id="student-score"></span>
+                (Đúng: <span id="student-correct"></span>/<span id="student-total"></span>)
+            </div>
+            <br>
+            <div class="result-table">
+                <table><thead><tr><th>Câu</th><th>Bài làm</th></tr></thead><tbody id="student-table-body"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            const formData = new FormData(this);
+            const resultDiv = document.getElementById('result-container');
+            const errorDiv = document.getElementById('error');
+            const errorJson = document.getElementById('error-json');
+            const loadingDiv = document.getElementById('loading');
+
+            resultDiv.style.display = 'none'; 
+            errorDiv.style.display = 'none'; 
+            loadingDiv.style.display = 'block'; 
+
+            fetch('/grade', { method: 'POST', body: formData })
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(dataObj => {
+                loadingDiv.style.display = 'none';
+                if (dataObj.status != 200 || dataObj.body.status == "error") {
+                    errorJson.textContent = JSON.stringify(dataObj.body, null, 2); 
+                    errorDiv.style.display = 'block';
+                    resultDiv.style.display = 'none';
+                    return;
+                }
+                try {
+                    renderResults(dataObj.body);
+                    resultDiv.style.display = 'grid'; 
+                    errorDiv.style.display = 'none';
+                } catch (jsError) {
+                    errorJson.textContent = "Lỗi JavaScript khi hiển thị kết quả: " + jsError.message + "\n\nServer trả về (JSON):\n" + JSON.stringify(dataObj.body, null, 2);
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                loadingDiv.style.display = 'none';
+                errorJson.textContent = 'Lỗi kết nối nghiêm trọng: ' + error;
+                errorDiv.style.display = 'block';
+            });
+        });
+
+        function renderResults(data) {
+            // Kiểm tra "bảo hiểm"
+            if (!data || !data.student_answers || !data.answer_key_info || !data.answer_key_info.student_answers) {
+                throw new Error("Dữ liệu trả về từ server không đầy đủ. Thiếu 'student_answers' hoặc 'answer_key_info'.");
+            }
+
+            // Cập nhật thông tin chung
+            document.getElementById('student-test-id').textContent = data.test_id || 'Lỗi';
+            document.getElementById('student-sbd').textContent = data.sbd || 'Lỗi';
+            document.getElementById('student-score').textContent = data.score_10;
+            document.getElementById('student-correct').textContent = data.total_correct;
+            document.getElementById('student-total').textContent = data.total_questions;
+
+            const keyInfo = data.answer_key_info;
+            // Dùng Object.values() để chuyển {0:'A', 1:'B'} thành ['A', 'B']
+            const answerKeyList = Object.values(keyInfo.student_answers); 
+            
+            document.getElementById('key-test-id').textContent = keyInfo.test_id || 'Lỗi';
+            
+            // --- LOGIC HIỂN THỊ SAI MÃ ĐỀ ---
+            const mismatchMsgSpan = document.getElementById('test-id-mismatch-msg');
+            if (data.test_id_mismatch === true) { // Kiểm tra cờ từ server
+                mismatchMsgSpan.textContent = '(SAI MÃ ĐỀ!)';
+            } else {
+                mismatchMsgSpan.textContent = ''; // Xóa cảnh báo cũ
+            }
+            // --- KẾT THÚC LOGIC ---
+
+            const studentTableBody = document.getElementById('student-table-body');
+            studentTableBody.innerHTML = ''; 
+            const keyTableBody = document.getElementById('key-table-body');
+            keyTableBody.innerHTML = ''; 
+
+            for (let i = 0; i < data.total_questions; i++) {
+                const questionNum = i + 1;
+                // Lấy đáp án từ object
+                const studentAnswer = data.student_answers[i] || 'Lỗi'; 
+                const correctAnswer = answerKeyList[i] || 'Lỗi';
+
+                // Tạo hàng đáp án (Cột trái)
+                const keyRow = document.createElement('tr');
+                keyRow.innerHTML = `<td><strong>${questionNum}</strong></td><td>${correctAnswer}</td>`;
+                keyTableBody.appendChild(keyRow);
+
+                // Tạo hàng bài làm (Cột phải)
+                const studentRow = document.createElement('tr');
+                let answerCellHtml = '';
+                
+                // Nếu sai mã đề, hiển thị "Không chấm"
+                if (data.test_id_mismatch === true) { 
+                     answerCellHtml = `<span>${studentAnswer} (Không chấm)</span>`;
+                } else if (studentAnswer === correctAnswer) { // Nếu đúng
+                    answerCellHtml = `<span class="correct">${studentAnswer} (Đúng)</span>`;
+                } else { // Nếu sai
+                    answerCellHtml = `<span class="incorrect">${studentAnswer} (Sai)</span><span class="incorrect-correct-ans">-> ${correctAnswer}</span>`;
+                }
+                studentRow.innerHTML = `<td><strong>${questionNum}</strong></td><td>${answerCellHtml}</td>`;
+                studentTableBody.appendChild(studentRow);
+            }
+        }
+    </script>
+</body>
+</html>

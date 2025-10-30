@@ -16,8 +16,8 @@ VALID_DIR = os.path.join(PROCESSED_DATA_DIR, 'valid')
 MODEL_SAVE_PATH = os.path.join(SCRIPT_DIR, '..', 'data', 'saved_model', 'omr_bubble_model.h5')
 
 # Thông số hình ảnh 
-IMG_HEIGHT = 28
-IMG_WIDTH = 28
+IMG_HEIGHT = 20
+IMG_WIDTH = 20
 IMG_CHANNELS = 1 # 1 cho ảnh xám (grayscale)
 
 # Thông số huấn luyện
