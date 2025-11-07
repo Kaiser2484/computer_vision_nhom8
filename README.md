@@ -123,8 +123,6 @@ python app/main.py
 
 \[5\] C. R. Harris, K. J. Millman, S. J. van der Walt, và cs., “Array programming with NumPy,” *Tạp chí Nature*, tập 585, tr. 357–362, 2020\.
 
-\[6\] N. V. An, “*Nghiên cứu và xây dựng hệ thống chấm trắc nghiệm tự động sử dụng xử lý ảnh và học máy*,” Luận văn Thạc sĩ, Trường Đại học Bách khoa Hà Nội, Hà Nội, 2020\.
+\[6\] Pandas Development Team, “pandas: powerful Python data analysis toolkit.” \[Trực tuyến\]. Địa chỉ: https://pandas.pydata.org/ \[Truy cập ngày 04/11/2025\].
 
-\[7\] Pandas Development Team, “pandas: powerful Python data analysis toolkit.” \[Trực tuyến\]. Địa chỉ: https://pandas.pydata.org/ \[Truy cập ngày 04/11/2025\].
-
-\[8\] A. Rosebrock, “Bubble Sheet Multiple Choice Scanner and Test Grader using OMR, Python and OpenCV,” *PyImageSearch*. \[Trực tuyến\]. Địa chỉ: https://pyimagesearch.com/2016/10/03/bubble-sheet-multiple-choice-scanner-and-test-grader-using-omr-python-and-opencv/ \[Truy cập ngày 04/11/2025\].
+\[7\] A. Rosebrock, “Bubble Sheet Multiple Choice Scanner and Test Grader using OMR, Python and OpenCV,” *PyImageSearch*. \[Trực tuyến\]. Địa chỉ: https://pyimagesearch.com/2016/10/03/bubble-sheet-multiple-choice-scanner-and-test-grader-using-omr-python-and-opencv/ \[Truy cập ngày 04/11/2025\].
