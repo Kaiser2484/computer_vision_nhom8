@@ -113,11 +113,9 @@ python app/main.py
 
 ## **7\. Tài liệu tham khảo và Tài nguyên**
 
-*(Chỉ bao gồm các tài liệu được trích dẫn, sử dụng và đề cập tới trong báo cáo, theo chuẩn IEEE)*
-
 \[1\] OpenCV, “OpenCV (Open Source Computer Vision Library).” \[Trực tuyến\]. Địa chỉ: https://opencv.org/ \[Truy cập ngày 04/11/2025\].
 
-# **\[2\] M. Abadi, A. Agarwal, P. Barham, và cs., “TensorFlow: Large-scale machine learning on heterogeneous systems,” trong *Kỷ yếu Hội nghị USENIX Symposium on Operating Systems Design and Implementation (OSDI '16) lần thứ 12*, Savannah, GA, USA, 2016, tr. 1-16.**
+\[2\] M. Abadi, A. Agarwal, P. Barham, và cs., “TensorFlow: Large-scale machine learning on heterogeneous systems,” trong *Kỷ yếu Hội nghị USENIX Symposium on Operating Systems Design and Implementation (OSDI '16) lần thứ 12*, Savannah, GA, USA, 2016, tr. 1-16.**
 
 \[3\] Pallets Projects, “Flask: A web framework for Python.” \[Trực tuyến\]. Địa chỉ: https://flask.palletsprojects.com/ \[Truy cập ngày 04/11/2025\].
 
