@@ -10,7 +10,7 @@ Hệ thống có khả năng đọc ảnh scan hoặc ảnh chụp (đã căn th
 
 Bạn có thể tìm thấy toàn bộ mã nguồn của dự án tại đây:
 
-➡️ **\[Link GitHub của bạn\]** *(Ví dụ: https://www.google.com/search?q=https://github.com/ten-cua-ban/omr-project)*
+https://github.com/Kaiser2484/computer_vision_nhom8.git
 
 ## **2\. Tính năng nổi bật**
 
